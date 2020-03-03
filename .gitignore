@@ -30,3 +30,10 @@
 *.exe
 *.out
 *.app
+
+# Atom ctrl + o (header to cpp)
+*.h.gch
+
+# Build path
+build/
+build/*
