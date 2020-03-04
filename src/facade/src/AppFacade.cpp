@@ -4,9 +4,7 @@ AppFacade::AppFacade():
     m_listViewController(nullptr),
     m_listView(nullptr)
 {
-    std::shared_ptr<PlaylistModel> playlistModel =
-        std::make_shared<PlaylistModel>("", 0);
-    m_playlistModelList.emplace_back(playlistModel);
+    m_playlistModelList;
     m_InitializeListView();
     m_InitializeListController();
     m_listViewController->ShowView();

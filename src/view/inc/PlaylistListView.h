@@ -25,20 +25,20 @@ public:
 
     QString GetNewPlaylistName() const;
 
-    void AddNewPlaylist(const QString &playlist);
+    void AddNewPlaylist(const QString &name);
 
     void RemovePlaylist();
 
     int GetNewPlaylistId() const;
 
 signals:
-    void OnAddPlaylistEvent();
+    void OnAddPlaylistEvent(const QString &name);
 
-    void OnEditPlaylistEvent();
+    void OnEditPlaylistEvent(const QString &name);
 
-    void OnRemovePlaylistEvent();
+    void OnRemovePlaylistEvent(const QString &name);
 
-    void OnPlayPlaylistEvent();
+    void OnPlayPlaylistEvent(const QString &name);
 
     void OnCloseEvent();
 
@@ -47,6 +47,12 @@ private:
     void m_CreateMainLayout();
     void m_CreateButtonBoxLayout();
     void m_ConnectEvents();
+
+    void m_OnAddPlaylistEvent();
+    void m_OnEditPlaylistEvent();
+    void m_OnRemovePlaylistEvent();
+    void m_OnPlayPlaylistEvent();
+    bool m_VerifyPlaylistName(const QString &name);
 
     QGridLayout *m_addPlaylistLayout;
     QVBoxLayout *m_verticalLayout;

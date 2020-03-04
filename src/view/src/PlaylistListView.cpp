@@ -1,5 +1,6 @@
 #include "PlaylistListView.h"
 #include <QHeaderView>
+#include <QMessageBox>
 #include "Defs.h"
 PlaylistListView::PlaylistListView(QWidget *parent):
     QWidget(parent),
@@ -34,15 +35,74 @@ QString PlaylistListView::GetNewPlaylistName() const
 void PlaylistListView::m_ConnectEvents()
 {
     connect(m_addPlaylistButton, &QPushButton::released, this,
-            &PlaylistListView::OnAddPlaylistEvent);
+            &PlaylistListView::m_OnAddPlaylistEvent);
     connect(m_delPlaylistButton, &QPushButton::released, this,
-            &PlaylistListView::OnRemovePlaylistEvent);
+            &PlaylistListView::m_OnRemovePlaylistEvent);
     connect(m_editPlaylistButton, &QPushButton::released, this,
-            &PlaylistListView::OnEditPlaylistEvent);
+            &PlaylistListView::m_OnEditPlaylistEvent);
     connect(m_playPlaylistButton, &QPushButton::released, this,
-            &PlaylistListView::OnPlayPlaylistEvent);
+            &PlaylistListView::m_OnPlayPlaylistEvent);
     connect(m_closeButton, &QPushButton::released, this,
             &PlaylistListView::OnCloseEvent);
+}
+
+void PlaylistListView::m_OnAddPlaylistEvent()
+{
+    QString name = m_playlistNameEdit->text();
+    if (!m_VerifyPlaylistName(name))
+    {
+        QMessageBox msgBox;
+        msgBox.setText("This name is already in use.");
+        msgBox.exec();
+        return;
+    }
+    int lastRow = m_playlistTable->rowCount();
+    int lastCol = m_playlistTable->columnCount();
+    m_playlistTable->insertRow(lastRow);
+    QTableWidgetItem *item = new QTableWidgetItem(name);
+    m_playlistTable->setItem(lastRow, lastCol - 1, item);
+
+    OnAddPlaylistEvent(name);
+}
+
+bool PlaylistListView::m_VerifyPlaylistName(const QString &name)
+{
+    for (int i = 0; i < m_playlistTable->rowCount(); i++)
+    {
+        if (m_playlistTable->itemAt(i, 0)->text() == name)
+            return false;
+    }
+    return true;
+}
+
+void PlaylistListView::m_OnEditPlaylistEvent()
+{
+    QList<QTableWidgetItem *> selectedItems = m_playlistTable->selectedItems();
+    // consider only the first selected item.
+    QString id = selectedItems.at(0)->text();
+    OnEditPlaylistEvent(id);
+}
+
+void PlaylistListView::m_OnRemovePlaylistEvent()
+{
+    QMessageBox::StandardButton reply;
+    reply = QMessageBox::question(this, "Remove playlist", "Confirm removing selected playlists?",
+                                  QMessageBox::Yes|QMessageBox::No);
+    if (reply == QMessageBox::Yes)
+    {
+        QList<QTableWidgetItem *> selectedItems = m_playlistTable->selectedItems();
+        for (auto item : selectedItems)
+        {
+            QString id = item->text();
+            m_playlistTable->removeRow(item->row());
+            OnRemovePlaylistEvent(id);
+        }
+    }
+}
+
+void PlaylistListView::m_OnPlayPlaylistEvent()
+{
+
 }
 
 void PlaylistListView::m_CreateAddPlaylistLayout()
@@ -73,6 +133,7 @@ void PlaylistListView::m_CreateMainLayout()
     m_playlistTable->resizeColumnsToContents();
     m_playlistTable->horizontalHeader()->setStretchLastSection(true);
     m_playlistTable->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    m_playlistTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
     QStringList list;
     list.append("Playlist name");
     m_playlistTable->setHorizontalHeaderLabels(list);
@@ -103,7 +164,6 @@ void PlaylistListView::m_CreateButtonBoxLayout()
 
 void PlaylistListView::AddNewPlaylist(const QString &playlist)
 {
-    // m_playlistTable->
     int lastRow = m_playlistTable->rowCount();
     int lastCol = m_playlistTable->columnCount();
     m_playlistTable->insertRow(lastRow);

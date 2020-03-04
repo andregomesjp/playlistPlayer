@@ -25,13 +25,14 @@ public:
 
 signals:
     void OnAddPlaylistEvent();
+
     void OnCloseEvent();
 
 private:
-    void m_OnAddPlaylistEvent();
-    void m_OnRemovePlaylistEvent();
-    void m_OnEditPlaylistEvent();
-    void m_OnPlayPlaylistEvent();
+    void m_OnAddPlaylistEvent(const QString &name);
+    void m_OnRemovePlaylistEvent(const QString &name);
+    void m_OnEditPlaylistEvent(const QString &name);
+    void m_OnPlayPlaylistEvent(const QString &name);
     void m_InsertPlaylists();
     std::vector<std::shared_ptr<PlaylistModel>> m_model;
     PlaylistListView *m_view;

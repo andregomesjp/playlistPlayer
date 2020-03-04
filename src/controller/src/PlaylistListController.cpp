@@ -31,28 +31,34 @@ void PlaylistListController::HideView()
     m_view->hide();
 }
 
-void PlaylistListController::m_OnRemovePlaylistEvent()
+void PlaylistListController::m_OnRemovePlaylistEvent(const QString &name)
+{
+    for (std::vector<std::shared_ptr<PlaylistModel>>::iterator it = m_model.begin();
+         it != m_model.end(); ++it)
+     {
+         if ((*it)->GetName() == name)
+         {
+             m_model.erase(it);
+             return;
+         }
+     }
+}
+
+void PlaylistListController::m_OnEditPlaylistEvent(const QString &name)
 {
 
 }
 
-void PlaylistListController::m_OnEditPlaylistEvent()
-{
-
-}
-
-void PlaylistListController::m_OnPlayPlaylistEvent()
+void PlaylistListController::m_OnPlayPlaylistEvent(const QString &name)
 {
     return;
 }
 
-void PlaylistListController::m_OnAddPlaylistEvent()
+void PlaylistListController::m_OnAddPlaylistEvent(const QString &name)
 {
-    QString newPlaylistName = m_view->GetNewPlaylistName();
-    int newPlaylistId = m_view->GetNewPlaylistId();
-
     std::shared_ptr<PlaylistModel> newPlaylist =
-        std::make_shared<PlaylistModel>(newPlaylistName, newPlaylistId);
+        std::make_shared<PlaylistModel>(name);
+    m_model.emplace_back(newPlaylist);
     m_currentPlaylist = newPlaylist;
     emit OnAddPlaylistEvent();
 }
